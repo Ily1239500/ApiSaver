@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -9,13 +9,13 @@ export default async function handler(req, res) {
   let body = {};
 
   try {
-    // Read raw body as JSON
+    // Read raw data from request
     const chunks = [];
     for await (const chunk of req) {
       chunks.push(chunk);
     }
     const rawBody = Buffer.concat(chunks).toString();
-    body = JSON.parse(rawBody);
+    body = JSON.parse(rawBody); // parse JSON manually
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON" });
   }
@@ -28,7 +28,6 @@ export default async function handler(req, res) {
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 
   const filePath = path.join(dataDir, "scripts.json");
-
   let scripts = [];
   if (fs.existsSync(filePath)) {
     scripts = JSON.parse(fs.readFileSync(filePath));
