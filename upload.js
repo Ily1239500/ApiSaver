@@ -9,13 +9,12 @@ export default async function handler(req, res) {
   let body = {};
 
   try {
-    // Read raw data from request
     const chunks = [];
     for await (const chunk of req) {
       chunks.push(chunk);
     }
-    const rawBody = Buffer.concat(chunks).toString();
-    body = JSON.parse(rawBody); // parse JSON manually
+    const rawBody = Buffer.concat(chunks).toString("utf8");
+    body = JSON.parse(rawBody); // manually parse JSON
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON" });
   }
@@ -30,7 +29,7 @@ export default async function handler(req, res) {
   const filePath = path.join(dataDir, "scripts.json");
   let scripts = [];
   if (fs.existsSync(filePath)) {
-    scripts = JSON.parse(fs.readFileSync(filePath));
+    scripts = JSON.parse(fs.readFileSync(filePath, "utf8"));
   }
 
   scripts.push({
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
     date: new Date().toISOString()
   });
 
-  fs.writeFileSync(filePath, JSON.stringify(scripts, null, 2));
+  fs.writeFileSync(filePath, JSON.stringify(scripts, null, 2), "utf8");
 
   res.status(200).json({ success: true });
 }
